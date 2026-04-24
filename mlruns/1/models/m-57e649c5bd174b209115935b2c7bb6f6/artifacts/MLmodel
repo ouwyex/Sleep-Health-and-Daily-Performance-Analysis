@@ -1,0 +1,23 @@
+artifact_path: file:///C:/Users/user/Desktop/Sleep-Health-and-Daily-Performance-Analysis/mlruns/1/models/m-57e649c5bd174b209115935b2c7bb6f6/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.0
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.2
+    skops_trusted_types: null
+mlflow_version: 3.11.1
+model_id: m-57e649c5bd174b209115935b2c7bb6f6
+model_size_bytes: 411963
+model_uuid: m-57e649c5bd174b209115935b2c7bb6f6
+prompts: null
+run_id: 73506a4e77cf4452987c92f9c199fdf8
+utc_time_created: '2026-04-24 12:53:21.050173'
