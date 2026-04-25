@@ -1,43 +1,38 @@
-"""
-app.py - Streamlit frontend for Sleep Disorder Prediction API
-Run with: streamlit run app.py
-"""
-
 import streamlit as st
 import requests
 import json
 
 API_URL = "http://localhost:8000"
 
-# ── Page config ───────────────────────────────────────────────────────────────
+# Page config
 st.set_page_config(
     page_title="Sleep Disorder Predictor",
-    page_icon="🛌",
+    page_icon="",
     layout="centered",
 )
 
-st.title("🛌 Sleep Disorder Predictor")
+st.title("Sleep Disorder Predictor")
 st.markdown(
     "Fill in your lifestyle and health metrics below to predict "
     "whether you have **Insomnia**, **Sleep Apnea**, or **no disorder**."
 )
 
-# ── Check API health ──────────────────────────────────────────────────────────
+# Check API health
 try:
     health = requests.get(f"{API_URL}/", timeout=3)
     if health.status_code == 200:
-        st.success("✅ API is running")
+        st.success("API is running")
     else:
-        st.warning("⚠️ API returned an unexpected status.")
+        st.warning("API returned an unexpected status.")
 except requests.exceptions.ConnectionError:
     st.error(
-        "❌ Cannot reach the API at `http://localhost:8000`. "
+        "Cannot reach the API at `http://localhost:8000`. "
         "Make sure FastAPI (or Docker) is running first."
     )
 
 st.divider()
 
-# ── Input form ────────────────────────────────────────────────────────────────
+# Input form
 col1, col2 = st.columns(2)
 
 with col1:
@@ -64,8 +59,8 @@ with col2:
 
 st.divider()
 
-# ── Predict button ────────────────────────────────────────────────────────────
-if st.button("🔍 Predict Sleep Disorder", use_container_width=True, type="primary"):
+# Predict button
+if st.button("Predict Sleep Disorder", use_container_width=True, type="primary"):
     payload = {
         "gender": gender,
         "age": age,
@@ -88,7 +83,7 @@ if st.button("🔍 Predict Sleep Disorder", use_container_width=True, type="prim
         prediction = result["prediction"]
         probabilities = result["probabilities"]
 
-        # ── Result display ────────────────────────────────────────────────────
+        # Result display
         color_map = {
             "None": "green",
             "Insomnia": "orange",
@@ -115,15 +110,15 @@ if st.button("🔍 Predict Sleep Disorder", use_container_width=True, type="prim
             st.progress(prob, text=f"{cls}: {prob:.1%}")
 
         # Raw JSON expander
-        with st.expander("📋 Raw API response"):
+        with st.expander("Raw API response"):
             st.json(result)
 
     except requests.exceptions.ConnectionError:
-        st.error("❌ Could not connect to the API.")
+        st.error("Could not connect to the API.")
     except Exception as e:
         st.error(f"Something went wrong: {e}")
 
-# ── Footer ────────────────────────────────────────────────────────────────────
+# Footer
 st.divider()
 st.caption(
     "Model: Random Forest · "

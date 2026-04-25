@@ -1,7 +1,3 @@
-"""
-main.py - FastAPI application for Sleep Disorder prediction
-"""
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal

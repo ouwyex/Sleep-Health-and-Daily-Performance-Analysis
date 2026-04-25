@@ -1,11 +1,3 @@
-"""
-train.py - Train a Sleep Disorder classification model
-Dataset: Sleep Health and Daily Performance Dataset (Kaggle)
-Target: Predict Sleep Disorder (None / Insomnia / Sleep Apnea)
-
-Includes MLflow experiment tracking and model registry.
-"""
-
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -49,14 +41,12 @@ data = {
     "Daily Steps":             np.random.randint(3000, 10000, N),
 }
 
-# Derive systolic / diastolic from stress & BMI (realistic pattern)
 sys = (110 + data["Stress Level"] * 2 +
        (data["BMI Category"] == "Obese").astype(int) * 10 +
        np.random.randint(-5, 6, N))
 dia = (sys * 0.62 + np.random.randint(-3, 4, N)).astype(int)
 data["Blood Pressure"] = [f"{s}/{d}" for s, d in zip(sys, dia)]
 
-# Rule-based target (mimics real-world patterns)
 disorder = []
 for i in range(N):
     if (data["Stress Level"][i] >= 7 and
@@ -75,7 +65,6 @@ df = pd.DataFrame(data)
 print(f"Dataset shape: {df.shape}")
 print(f"Sleep Disorder distribution:\n{df['Sleep Disorder'].value_counts()}\n")
 
-# ── Feature engineering ──────────────────────────────────────────────────────
 le_gender     = LabelEncoder().fit(df["Gender"])
 le_occupation = LabelEncoder().fit(df["Occupation"])
 le_bmi        = LabelEncoder().fit(df["BMI Category"])
@@ -105,7 +94,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# ── Hyperparameters ───────────────────────────────────────────────────────────
 PARAMS = {
     "n_estimators": 100,
     "max_depth":    None,
@@ -113,18 +101,15 @@ PARAMS = {
     "min_samples_split": 2,
 }
 
-# ── MLflow: experiment setup ──────────────────────────────────────────────────
 mlflow.set_experiment("sleep-disorder-classification")
 
 with mlflow.start_run(run_name="random-forest-v1"):
 
-    # ── Train ──────────────────────────────────────────────────────────────────
     clf = RandomForestClassifier(**PARAMS)
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
 
-    # ── Metrics ────────────────────────────────────────────────────────────────
     acc       = accuracy_score(y_test, y_pred)
     f1_macro  = f1_score(y_test, y_pred, average="macro",     zero_division=0)
     f1_weight = f1_score(y_test, y_pred, average="weighted",  zero_division=0)
@@ -139,7 +124,6 @@ with mlflow.start_run(run_name="random-forest-v1"):
                                  target_names=le_target.classes_,
                                  zero_division=0))
 
-    # ── Log params & metrics to MLflow ────────────────────────────────────────
     mlflow.log_params(PARAMS)
     mlflow.log_metrics({
         "accuracy":           acc,
@@ -149,7 +133,6 @@ with mlflow.start_run(run_name="random-forest-v1"):
         "recall_weighted":    rec,
     })
 
-    # ── Save joblib artefact (for FastAPI) ────────────────────────────────────
     artefacts = {
         "model":          clf,
         "le_gender":      le_gender,
@@ -159,13 +142,12 @@ with mlflow.start_run(run_name="random-forest-v1"):
         "feature_names":  FEATURES,
     }
     joblib.dump(artefacts, "model.joblib")
-    mlflow.log_artifact("model.joblib")          # attach file to the run
+    mlflow.log_artifact("model.joblib")
 
-    # ── Log the sklearn model + register it ───────────────────────────────────
     mlflow.sklearn.log_model(
         sk_model=clf,
         artifact_path="sklearn-model",
-        registered_model_name="SleepDisorderClassifier",   # Model Registry
+        registered_model_name="SleepDisorderClassifier",
     )
 
     run_id = mlflow.active_run().info.run_id
