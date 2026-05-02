@@ -147,3 +147,32 @@ Open `mlflow ui` to browse experiments, compare runs, and manage model versions.
 | Train / Test split | 80 / 20 |
 | Accuracy | ~97% |
  
+## Batch Prediction Pipeline (Task 7)
+
+ 
+| File | Role |
+|------|------|
+| `setup_db.py` | Creates SQLite database + populates `input_data` with 50 sample rows |
+| `batch_predict.py` | Reads unpredicted rows → runs model → writes to `predictions` table |
+| `scheduler.py` | Runs `batch_predict` automatically every 5 minutes via APScheduler |
+ 
+### Database schema
+ 
+**input_data** — stores raw feature records:
+`id, gender, age, occupation, sleep_duration, quality_of_sleep, physical_activity_level, stress_level, bmi_category, heart_rate, daily_steps, blood_pressure_systolic, blood_pressure_diastolic`
+ 
+**predictions** — stores results:
+`id, input_id, prediction, probability_none, probability_insomnia, probability_apnea, prediction_timestamp`
+ 
+### How to run
+ 
+```bash
+# 1. Setup database (run once)
+python setup_db.py
+ 
+# 2. Run batch prediction manually
+python batch_predict.py
+ 
+# 3. Start automatic scheduler (every 5 minutes)
+python scheduler.py
+```
