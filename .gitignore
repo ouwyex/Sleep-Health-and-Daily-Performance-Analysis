@@ -7,3 +7,5 @@ mlflow.db
 
 *.joblib
 *.pkl
+
+sleep_pipeline.db
